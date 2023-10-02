@@ -21,6 +21,8 @@ A simple movie app that uses the [The Movie Database API](https://developers.the
     ```
     flutter run --dart-define=TMDB_API_KEY=YOUR_API_KEY
     ```
+### How to test
+The app includes unit tests for serialization, as well as the functions in the repositories and services. To run the tests, simply run `flutter test`.
 
 ## Built with
 
