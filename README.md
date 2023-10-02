@@ -30,3 +30,14 @@ A simple movie app that uses the [The Movie Database API](https://developers.the
 - [dio](https://pub.dev/packages/dio)
 
 ## Video Walkthrough
+
+### iOS
+
+https://github.com/rafaelortizzableh/simple_movie_app/assets/57945332/9f2d0526-9b22-42d9-a309-ade2e8d95b0f
+
+
+
+### Android
+
+https://github.com/rafaelortizzableh/simple_movie_app/assets/57945332/d4cc095f-f2ae-48c4-8e00-c8b34b49e52d
+
