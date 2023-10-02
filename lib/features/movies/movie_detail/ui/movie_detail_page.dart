@@ -17,34 +17,38 @@ class MovieDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(movie.title)),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Padding(
-              padding: AppConstants.padding12,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  if (movie.posterPath != null)
-                    MovieDetailPoster(
-                      moviePosterUrl: movie.posterPath!,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: AppConstants.padding12,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    if (movie.posterPath != null) ...[
+                      MovieDetailPoster(
+                        moviePosterUrl: movie.posterPath!,
+                      ),
+                    ],
+                    Positioned(
+                      bottom: -AppConstants.spacing24,
+                      left: AppConstants.spacing24,
+                      child: MovieDetailScore(
+                        score: movie.voteAverage,
+                      ),
                     ),
-                  // TODO (rafaelortizzableh): Add score widget
-                  // Positioned(
-                  //   bottom: 0,
-                  //   left: 8,
-                  //   MovieDetailScore(),
-                  // ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: AppConstants.padding8,
-              child: Text(movie.overview),
-            ),
-          ],
+              Padding(
+                padding: AppConstants.padding12,
+                child: Text(movie.overview),
+              ),
+            ],
+          ),
         ),
       ),
     );

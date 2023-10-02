@@ -5,6 +5,7 @@ abstract class AppConstants {
   static const primaryColor = Color(0xFF032541);
 
   // Spacing
+  static const double spacing1 = 1.0;
   static const double spacing2 = 2.0;
   static const double spacing4 = 4.0;
   static const double spacing6 = 6.0;
@@ -66,6 +67,8 @@ abstract class AppConstants {
   static const rightPadding24 = EdgeInsets.only(right: spacing24);
   static const rightPadding32 = EdgeInsets.only(right: spacing32);
 
+  static const padding1 = EdgeInsets.all(spacing1);
+  static const padding2 = EdgeInsets.all(spacing2);
   static const padding4 = EdgeInsets.all(spacing4);
   static const padding8 = EdgeInsets.all(spacing8);
   static const padding12 = EdgeInsets.all(spacing12);
