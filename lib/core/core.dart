@@ -3,4 +3,5 @@ export 'failure.dart';
 export 'failures/failures.dart';
 export 'router.dart';
 export 'services/services.dart';
+export 'theme.dart';
 export 'widgets/widgets.dart';
