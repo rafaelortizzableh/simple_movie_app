@@ -1,16 +1,32 @@
 # simple_movie_app
 
-A new Flutter project.
+A simple movie app that uses the [The Movie Database API](https://developers.themoviedb.org/3/getting-started/introduction) to display a list of movies and their details.
+
+## Features
+
+- Display a list of movies
+- Display movie details
+- Search for movies
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+### Prerequisites
+- Flutter SDK
 
-A few resources to get you started if this is your first Flutter project:
+### How to run
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+1. Clone this repository
+2. Run `flutter pub get`
+3. Run `flutter run` with your TMDB API key as an argument:
+    ```
+    flutter run --dart-define=TMDB_API_KEY=YOUR_API_KEY
+    ```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Built with
+
+- [Flutter](https://flutter.dev/)
+- [The Movie Database API](https://developers.themoviedb.org/3/getting-started/introduction)
+- [flutter_riverpod](https://pub.dev/packages/flutter_riverpod)
+- [dio](https://pub.dev/packages/dio)
+
+## Video Walkthrough
