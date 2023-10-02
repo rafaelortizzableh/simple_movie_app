@@ -28,6 +28,11 @@ final movieServiceProvider = Provider.autoDispose<MovieService>(
 
 abstract class MovieService {
   Future<List<MovieRemoteEntity>> getPopularMovies(int page);
+  Future<List<MovieRemoteEntity>> searchMovies(
+    String query,
+    int page,
+    CancelToken cancelToken,
+  );
 }
 
 class TMDBMovieService implements MovieService {
@@ -73,6 +78,54 @@ class TMDBMovieService implements MovieService {
     }
   }
 
+  @override
+  Future<List<MovieRemoteEntity>> searchMovies(
+    String query,
+    int page,
+    CancelToken cancelToken,
+  ) async {
+    try {
+      final response = await _dio.get(
+        '/search/movie',
+        queryParameters: {
+          'query': query,
+          'page': page,
+        },
+        cancelToken: cancelToken,
+      );
+
+      final totalResults = response.data['total_results'] as int;
+
+      if (totalResults == 0) {
+        Error.throwWithStackTrace(
+          const NoMoviesFoundFailure(),
+          StackTrace.current,
+        );
+      }
+
+      final results = response.data['results'] as List;
+
+      final movies = results
+          .map(
+            (map) => MovieRemoteEntity.fromMap(
+              map as Map<String, dynamic>,
+            ),
+          )
+          .toList();
+      return movies;
+    } on NoMoviesFoundFailure {
+      rethrow;
+    } catch (e, stackTrace) {
+      _loggerService.captureException(
+        e,
+        stackTrace: stackTrace,
+        tag: _tag,
+      );
+
+      _handleError(e, stackTrace);
+    }
+  }
+
   Never _handleError(Object error, StackTrace stackTrace) {
     if (error is DioException) {
       _handleDioException(error, stackTrace);
@@ -101,11 +154,7 @@ class TMDBMovieService implements MovieService {
     }
 
     if (exception.type == DioExceptionType.badResponse) {
-      final responseError = ApiInvalidResponseFailure(
-        body: exception.response?.data ?? {},
-        statusCode: exception.response?.statusCode ?? 400,
-      );
-      Error.throwWithStackTrace(responseError, stackTrace);
+      _handleBadResponse(exception, stackTrace);
     }
 
     if (exception.type == DioExceptionType.cancel) {
@@ -131,6 +180,23 @@ class TMDBMovieService implements MovieService {
     Error.throwWithStackTrace(
       ApiRequestFailure(
         error: exception,
+      ),
+      stackTrace,
+    );
+  }
+
+  Never _handleBadResponse(DioException exception, StackTrace stackTrace) {
+    if (exception.response?.statusCode == 404) {
+      Error.throwWithStackTrace(
+        const NoMoviesFoundFailure(),
+        stackTrace,
+      );
+    }
+
+    Error.throwWithStackTrace(
+      ApiInvalidResponseFailure(
+        body: exception.response?.data ?? {},
+        statusCode: exception.response?.statusCode ?? 400,
       ),
       stackTrace,
     );

@@ -120,5 +120,66 @@ void main() {
         throwsA(isA<NoInternetConnectionFailure>()),
       );
     });
+
+    test(
+      'Given a query string, '
+      'when searchMovies is called, '
+      'then a list of MovieRemoteEntity is returned',
+      () async {
+        // Given
+        const query = 'Star Wars';
+        final cancelToken = CancelToken();
+
+        addTearDown(() => cancelToken.cancel());
+
+        const path = '/search/movie';
+        final expectedMoviesRemoteEntities = [
+          const MovieRemoteEntity(
+            genreIds: [],
+            id: 1,
+            overview: 'Overview 1',
+            posterPath: '/poster1.jpg',
+            title: 'Star Wars: Episode IV - A New Hope',
+            releaseDate: '',
+            voteAverage: 5.0,
+            backdropPath: '',
+          ),
+          const MovieRemoteEntity(
+            genreIds: [],
+            id: 2,
+            overview: 'Overview 2',
+            posterPath: '/poster2.jpg',
+            title: 'Star Wars: Episode V - The Empire Strikes Back',
+            releaseDate: '',
+            voteAverage: 5.0,
+            backdropPath: '',
+          ),
+        ];
+
+        dioAdapter.onGet(
+          path,
+          (server) => server.reply(
+            HttpStatus.ok,
+            {
+              'total_results': 2,
+              'results':
+                  expectedMoviesRemoteEntities.map((e) => e.toMap()).toList(),
+            },
+            delay: const Duration(milliseconds: 100),
+          ),
+          queryParameters: {'page': 1},
+        );
+
+        // When
+        final movies = await service.searchMovies(
+          query,
+          1,
+          cancelToken,
+        );
+
+        // Then
+        expect(movies, equals(expectedMoviesRemoteEntities));
+      },
+    );
   });
 }

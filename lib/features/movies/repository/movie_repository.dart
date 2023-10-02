@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:multiple_result/multiple_result.dart';
 
@@ -34,7 +35,36 @@ class MovieRepository {
     }
   }
 
+  Future<Result<List<Movie>, MovieFailure>> searchMovies(
+    String query,
+    int page,
+    CancelToken cancelToken,
+  ) async {
+    try {
+      final movieRemoteEntities = await _movieService.searchMovies(
+        query,
+        page,
+        cancelToken,
+      );
+      final movies = movieRemoteEntities
+          .map(
+            (movieRemoteEntity) => movieRemoteEntity.toMovie(),
+          )
+          .toList();
+
+      return Result.success(movies);
+    } catch (e) {
+      return Result.error(_handleError(e));
+    }
+  }
+
   MovieFailure _handleError(Object error) {
+    if (error is NoMoviesFoundFailure) {
+      return MovieFailure(
+        type: MovieFailureType.noMoviesFound,
+      );
+    }
+
     if (error is NoInternetConnectionFailure) {
       return MovieFailure(
         type: MovieFailureType.noInternetConnection,

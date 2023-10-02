@@ -13,7 +13,7 @@ class MoviesPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Movie viewer'),
         actions: const [
-          // TODO(rafaelortizzableh): Add search button
+          MovieSearchIcon(),
         ],
       ),
       body: const PopularMoviesDataWrapper(),

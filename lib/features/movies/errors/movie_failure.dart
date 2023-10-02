@@ -25,6 +25,7 @@ class MovieFailure implements Failure {
           'Oops! Something went wrong when finding movies. Please try again later.',
       203:
           'Oops! Something went wrong when processing movies. Please try again later.',
+      204: 'No movies found. Please try again with a different query.',
     };
   }
 
@@ -46,6 +47,7 @@ enum MovieFailureType {
   noInternetConnection(201),
   serverError(202),
   serializationError(203),
+  noMoviesFound(204),
   unknown(200);
 
   const MovieFailureType(this.code);
