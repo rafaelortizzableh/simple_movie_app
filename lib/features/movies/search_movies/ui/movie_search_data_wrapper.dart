@@ -26,6 +26,7 @@ class _MovieSearchDataWrapperState
   @override
   void initState() {
     super.initState();
+    _debouncedSearch(widget.query);
     _scrollController.addListener(_paginationListener);
   }
 
@@ -36,9 +37,17 @@ class _MovieSearchDataWrapperState
   }
 
   @override
+  void didUpdateWidget(MovieSearchDataWrapper oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.query != widget.query) {
+      _debouncedSearch(widget.query);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final searchedMoviesState = ref.watch(
-      movieSearchControllerProvider(widget.query),
+      movieSearchControllerProvider,
     );
 
     return searchedMoviesState.movies.when(
@@ -65,21 +74,40 @@ class _MovieSearchDataWrapperState
     );
   }
 
+  void _debouncedSearch(String query) {
+    final controller = ref.read(
+      movieSearchControllerProvider.notifier,
+    );
+    Future(
+      () => unawaited(controller.debounceSearch(query)),
+    );
+  }
+
   void _paginationListener() {
-    final delta = _scrollController.position.maxScrollExtent -
+    final scrollDelta = _scrollController.position.maxScrollExtent -
         _scrollController.position.pixels;
-    if (delta < 25) {
-      final controller = ref.read(
-        movieSearchControllerProvider(widget.query).notifier,
-      );
-      unawaited(
-        controller.searchMovies(),
-      );
+
+    final normalizedDelta = scrollDelta.toInt();
+
+    if (normalizedDelta <= 50 && normalizedDelta >= 0) {
+      _fetchMoreMoviesFromQuery();
     }
   }
 
+  void _fetchMoreMoviesFromQuery() {
+    final isLoadingMore = ref.read(movieSearchControllerProvider).loadingMore;
+    if (isLoadingMore) return;
+    final controller = ref.read(
+      movieSearchControllerProvider.notifier,
+    );
+
+    unawaited(
+      controller.searchMovies(),
+    );
+  }
+
   void _refresh() {
-    ref.invalidate(movieSearchControllerProvider(widget.query));
+    ref.invalidate(movieSearchControllerProvider);
   }
 
   String _assignErrorMessage(Object error) {

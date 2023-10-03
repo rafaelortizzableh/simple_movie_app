@@ -93,7 +93,6 @@ class TMDBMovieService implements MovieService {
         },
         cancelToken: cancelToken,
       );
-
       final totalResults = response.data['total_results'] as int;
 
       if (totalResults == 0) {

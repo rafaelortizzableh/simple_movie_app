@@ -19,40 +19,71 @@ class MoviesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: onReload,
-      child: ListView.separated(
-        controller: scrollController,
-        itemCount: _listItemCount,
-        separatorBuilder: (context, index) => const Divider(),
-        itemBuilder: (context, index) {
-          if (index == movies.length) {
-            return const _LoadingTile();
-          }
-          final movie = movies[index];
-          return MovieTile(movie: movie);
-        },
-      ),
+    return Stack(
+      children: [
+        RefreshIndicator(
+          onRefresh: onReload,
+          child: ListView.separated(
+            controller: scrollController,
+            itemCount: movies.length,
+            separatorBuilder: (context, index) {
+              return const Divider();
+            },
+            itemBuilder: (context, index) {
+              final movie = movies[index];
+              return MovieTile(movie: movie);
+            },
+          ),
+        ),
+        _AnimatedLoadingIndicator(loadingMore: loadingMore),
+      ],
     );
-  }
-
-  int get _listItemCount {
-    if (loadingMore) {
-      return movies.length + 1;
-    }
-    return movies.length;
   }
 }
 
-class _LoadingTile extends StatelessWidget {
-  const _LoadingTile();
+class _AnimatedLoadingIndicator extends StatelessWidget {
+  const _AnimatedLoadingIndicator({
+    // ignore: unused_element
+    super.key,
+    required this.loadingMore,
+  });
+
+  final bool loadingMore;
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Padding(
-        padding: AppConstants.padding12,
-        child: CircularProgressIndicator.adaptive(),
+    return AnimatedAlign(
+      curve: Curves.easeInOut,
+      alignment:
+          loadingMore ? Alignment.bottomCenter : const Alignment(0.0, 1.5),
+      duration: const Duration(milliseconds: 150),
+      child: AnimatedPadding(
+        padding: EdgeInsets.only(
+          bottom: loadingMore ? AppConstants.spacing32 : 0.0,
+        ),
+        duration: const Duration(milliseconds: 150),
+        curve: Curves.easeInOut,
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 150),
+          opacity: loadingMore ? 1 : 0,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary,
+              shape: BoxShape.circle,
+            ),
+            child: const Padding(
+              padding: AppConstants.padding8,
+              child: SizedBox(
+                height: AppConstants.spacing24,
+                width: AppConstants.spacing24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2.5,
+                ),
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

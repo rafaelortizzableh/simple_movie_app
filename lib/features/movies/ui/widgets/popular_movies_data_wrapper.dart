@@ -62,9 +62,14 @@ class _PopularMoviesDataWrapperState
   }
 
   void _paginationListener() {
-    final delta = _scrollController.position.maxScrollExtent -
+    final scrollDelta = _scrollController.position.maxScrollExtent -
         _scrollController.position.pixels;
-    if (delta < 25) {
+
+    final normalizedDelta = scrollDelta.toInt();
+
+    if (normalizedDelta <= 50 && normalizedDelta >= 0) {
+      final isLoading = ref.read(movieListControllerProvider).loadingMore;
+      if (isLoading) return;
       unawaited(
         ref.read(movieListControllerProvider.notifier).getPopularMovies(),
       );

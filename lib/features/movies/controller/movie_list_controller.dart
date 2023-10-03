@@ -35,7 +35,7 @@ class MovieListController extends StateNotifier<MovieListState> {
       // a little bit to see the loading indicator.
       //
       // Showing it gives a more natural feeling to the user.
-      if (loadingMore) Future.delayed(const Duration(milliseconds: 500)),
+      if (loadingMore) Future.delayed(const Duration(seconds: 1)),
     ]))
         .first as Result<List<Movie>, MovieFailure>;
 

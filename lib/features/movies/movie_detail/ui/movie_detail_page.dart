@@ -15,6 +15,7 @@ class MovieDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(movie.title)),
       body: SafeArea(
@@ -41,6 +42,16 @@ class MovieDetailPage extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppConstants.spacing12,
+                  vertical: AppConstants.spacing16,
+                ),
+                child: Text(
+                  '🗓️ ${movie.releaseDate}',
+                  style: theme.textTheme.titleMedium,
                 ),
               ),
               Padding(

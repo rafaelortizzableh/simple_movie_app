@@ -4,38 +4,34 @@ import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:multiple_result/multiple_result.dart';
 
-import '../../../../core/core.dart';
 import '../../movies.dart';
 
 /// This is the provider for the [MovieSearchController].
-final movieSearchControllerProvider = StateNotifierProvider.family
-    .autoDispose<MovieSearchController, MovieSearchState, String>(
-  (ref, String query) {
+final movieSearchControllerProvider =
+    StateNotifierProvider.autoDispose<MovieSearchController, MovieSearchState>(
+  (ref) {
     final movieRepository = ref.watch(movieRepositoryProvider);
-    final searchDebouncer = ref.watch(_searchDebouncerProvider);
 
-    return MovieSearchController(
-      movieRepository,
-      query,
-      searchDebouncer,
-    );
+    return MovieSearchController(movieRepository);
   },
-);
-
-/// Search debouncer to avoid making too many requests.
-/// It waits for half a second before making the request.
-final _searchDebouncerProvider = Provider<Debouncer>(
-  (ref) => Debouncer(delay: const Duration(milliseconds: 500)),
 );
 
 class MovieSearchController extends StateNotifier<MovieSearchState> {
   MovieSearchController(
     this._movieRepository,
-    this._query,
-    this._debouncer,
   ) : super(MovieSearchState.initial()) {
     _cancelToken = CancelToken();
-    _debouncer.call(_init);
+  }
+
+  Future<void> debounceSearch(String newQueryCantidate) async {
+    final newQuery = newQueryCantidate.trim();
+    if (newQuery == state.debouncedQueryCandidate) return;
+    if (newQuery == state.query) return;
+    state = state.copyWith(debouncedQueryCandidate: newQuery);
+
+    await Future.delayed(const Duration(milliseconds: 750));
+    if (state.debouncedQueryCandidate != newQuery) return;
+    _firstSearch();
   }
 
   @override
@@ -44,12 +40,16 @@ class MovieSearchController extends StateNotifier<MovieSearchState> {
     super.dispose();
   }
 
-  late final CancelToken _cancelToken;
   final MovieRepository _movieRepository;
-  final String _query;
-  final Debouncer _debouncer;
+  late final CancelToken _cancelToken;
 
-  void _init() {
+  void _firstSearch() {
+    state = state.copyWith(
+      query: state.debouncedQueryCandidate,
+      debouncedQueryCandidate: '',
+      movies: const AsyncValue.loading(),
+      page: 0,
+    );
     unawaited(searchMovies());
   }
 
@@ -66,7 +66,7 @@ class MovieSearchController extends StateNotifier<MovieSearchState> {
 
     final result = (await Future.wait([
       _movieRepository.searchMovies(
-        _query,
+        state.query,
         pageToFetch,
         _cancelToken,
       ),
@@ -74,11 +74,12 @@ class MovieSearchController extends StateNotifier<MovieSearchState> {
       // a little bit to see the loading indicator.
       //
       // Showing it gives a more natural feeling to the user.
-      if (loadingMore) Future.delayed(const Duration(seconds: 750)),
+      if (loadingMore) Future.delayed(const Duration(seconds: 1)),
     ]))
         .first as Result<List<Movie>, MovieFailure>;
 
     if (!mounted) return;
+
     result.when(
       (movies) => state = state.copyWith(
         movies: AsyncValue.data(
@@ -104,11 +105,13 @@ class MovieSearchState {
     required this.movies,
     required this.loadingMore,
     required this.page,
+    required this.debouncedQueryCandidate,
   });
 
   factory MovieSearchState.initial() {
     return const MovieSearchState(
       query: '',
+      debouncedQueryCandidate: '',
       movies: AsyncValue.loading(),
       loadingMore: false,
       page: 0,
@@ -116,6 +119,7 @@ class MovieSearchState {
   }
 
   final String query;
+  final String debouncedQueryCandidate;
   final AsyncValue<List<Movie>> movies;
   final bool loadingMore;
   final int page;
@@ -128,7 +132,8 @@ class MovieSearchState {
         other.query == query &&
         other.movies == movies &&
         other.loadingMore == loadingMore &&
-        other.page == page;
+        other.page == page &&
+        other.debouncedQueryCandidate == debouncedQueryCandidate;
   }
 
   @override
@@ -136,7 +141,8 @@ class MovieSearchState {
     return query.hashCode ^
         movies.hashCode ^
         loadingMore.hashCode ^
-        page.hashCode;
+        page.hashCode ^
+        debouncedQueryCandidate.hashCode;
   }
 
   MovieSearchState copyWith({
@@ -144,17 +150,20 @@ class MovieSearchState {
     AsyncValue<List<Movie>>? movies,
     bool? loadingMore,
     int? page,
+    String? debouncedQueryCandidate,
   }) {
     return MovieSearchState(
       query: query ?? this.query,
       movies: movies ?? this.movies,
       loadingMore: loadingMore ?? this.loadingMore,
       page: page ?? this.page,
+      debouncedQueryCandidate:
+          debouncedQueryCandidate ?? this.debouncedQueryCandidate,
     );
   }
 
   @override
   String toString() {
-    return 'MovieSearchState(query: $query, movies: $movies, loadingMore: $loadingMore, page: $page)';
+    return 'MovieSearchState(query: $query, movies: $movies, loadingMore: $loadingMore, page: $page, debouncedQueryCandidate: $debouncedQueryCandidate)';
   }
 }

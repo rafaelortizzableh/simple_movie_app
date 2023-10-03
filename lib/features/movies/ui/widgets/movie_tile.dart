@@ -22,6 +22,7 @@ class MovieTile extends StatelessWidget {
         ),
       ),
       title: Text(movie.title),
+      subtitle: Text('🗓️ ${movie.releaseDate}'),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => _navigateToDetailPage(context),
     );
