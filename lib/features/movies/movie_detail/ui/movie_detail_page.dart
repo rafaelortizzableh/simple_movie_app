@@ -29,11 +29,9 @@ class MovieDetailPage extends StatelessWidget {
                 child: Stack(
                   clipBehavior: Clip.none,
                   children: [
-                    if (movie.posterPath != null) ...[
-                      MovieDetailPoster(
-                        moviePosterUrl: movie.posterPath!,
-                      ),
-                    ],
+                    MovieDetailPoster(
+                      moviePosterUrl: movie.posterPath,
+                    ),
                     Positioned(
                       bottom: -AppConstants.spacing24,
                       left: AppConstants.spacing24,
