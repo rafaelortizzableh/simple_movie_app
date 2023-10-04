@@ -52,39 +52,56 @@ class _AnimatedLoadingIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return AnimatedAlign(
-      curve: Curves.easeInOut,
-      alignment:
-          loadingMore ? Alignment.bottomCenter : const Alignment(0.0, 1.5),
-      duration: const Duration(milliseconds: 150),
+      curve: Curves.fastOutSlowIn,
+      alignment: _alignment,
+      duration: _slideDuration,
       child: AnimatedPadding(
-        padding: EdgeInsets.only(
-          bottom: loadingMore ? AppConstants.spacing32 : 0.0,
-        ),
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeInOut,
+        padding: EdgeInsets.only(bottom: _bottomPadding),
+        duration: _slideDuration,
+        curve: Curves.fastOutSlowIn,
         child: AnimatedOpacity(
-          duration: const Duration(milliseconds: 150),
-          opacity: loadingMore ? 1 : 0,
-          child: DecoratedBox(
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary,
-              shape: BoxShape.circle,
-            ),
-            child: const Padding(
-              padding: AppConstants.padding8,
-              child: SizedBox(
-                height: AppConstants.spacing24,
-                width: AppConstants.spacing24,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2.5,
-                ),
-              ),
-            ),
+          duration: _opacityDuration,
+          opacity: _opacity,
+          child: AnimatedSwitcher(
+            duration: _switcherDuration,
+            reverseDuration: _switcherDuration,
+            child: loadingMore
+                ? DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Padding(
+                      padding: AppConstants.padding8,
+                      child: SizedBox(
+                        height: AppConstants.spacing24,
+                        width: AppConstants.spacing24,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: _strokeWidth,
+                        ),
+                      ),
+                    ),
+                  )
+                : AppSpacingWidgets.emptySpace,
           ),
         ),
       ),
     );
   }
+
+  Alignment get _alignment =>
+      loadingMore ? Alignment.bottomCenter : const Alignment(0.0, 1.5);
+
+  double get _opacity => loadingMore ? 1.0 : 0.0;
+
+  double get _bottomPadding => loadingMore ? AppConstants.spacing24 : 0.0;
+
+  static const _strokeWidth = 2.5;
+
+  static const _slideDuration = Duration(milliseconds: 150);
+  static const _opacityDuration = Duration(milliseconds: 300);
+  static const _switcherDuration = Duration(milliseconds: 25);
 }

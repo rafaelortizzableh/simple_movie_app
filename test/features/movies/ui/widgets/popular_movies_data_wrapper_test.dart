@@ -64,9 +64,62 @@ void main() {
           ],
         );
 
-        await tester.pumpAndSettle();
+        await tester.pump(const Duration(milliseconds: 100));
 
         expect(find.byType(MovieTile), findsWidgets);
+      },
+    );
+
+    testWidgets(
+      'Given a success state, '
+      'when the user scrolls to the bottom of the list, '
+      'then a new list containing values from page 1 and 2 is shown.',
+      (tester) async {
+        final pageOneRemoteEntities = _generateMovies(20);
+        final pageTwoRemoteEntities = _generateMovies(20, 20);
+        when(
+          () => movieService.getPopularMovies(
+            1,
+          ),
+        ).thenAnswer((value) async => pageOneRemoteEntities);
+        when(
+          () => movieService.getPopularMovies(
+            2,
+          ),
+        ).thenAnswer((value) async => pageTwoRemoteEntities);
+
+        await tester.pumpApp(
+          const PopularMoviesDataWrapper(),
+          overrides: [
+            movieServiceProvider.overrideWithValue(
+              movieService,
+            )
+          ],
+        );
+
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(find.byType(MovieTile, skipOffstage: false), findsWidgets);
+
+        await tester.fling(
+          find.byType(MovieTile).last,
+          const Offset(0, -200),
+          1000,
+        );
+
+        await tester.pump(const Duration(milliseconds: 100));
+        final listFinder = find.byType(Scrollable);
+        final itemFinder = find.text('title 22');
+
+        await tester.scrollUntilVisible(
+          itemFinder,
+          500.0,
+          scrollable: listFinder,
+        );
+
+        await tester.pump(const Duration(milliseconds: 100));
+
+        expect(itemFinder, findsOneWidget);
       },
     );
 
@@ -97,4 +150,18 @@ void main() {
       },
     );
   });
+}
+
+List<MovieRemoteEntity> _generateMovies(int count, [int startFrom = 0]) {
+  return List.generate(
+    count,
+    (index) => MovieRemoteEntity(
+      title: 'title ${index + startFrom}',
+      overview: 'overview ${index + startFrom}',
+      voteAverage: 5.0,
+      genreIds: [1],
+      releaseDate: 'releaseDate $index',
+      id: index + startFrom,
+    ),
+  );
 }
