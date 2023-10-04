@@ -64,7 +64,7 @@ void main() {
           ],
         );
 
-        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pumpAndSettle();
 
         expect(find.byType(MovieTile), findsWidgets);
       },
@@ -97,7 +97,7 @@ void main() {
           ],
         );
 
-        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pumpAndSettle();
 
         expect(find.byType(MovieTile, skipOffstage: false), findsWidgets);
 
@@ -107,7 +107,7 @@ void main() {
           1000,
         );
 
-        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pumpAndSettle();
         final listFinder = find.byType(Scrollable);
         final itemFinder = find.text('title 22');
 
@@ -117,7 +117,7 @@ void main() {
           scrollable: listFinder,
         );
 
-        await tester.pump(const Duration(milliseconds: 100));
+        await tester.pumpAndSettle();
 
         expect(itemFinder, findsOneWidget);
       },
