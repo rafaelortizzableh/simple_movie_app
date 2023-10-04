@@ -1,2 +1,2 @@
-export 'controller/search_controller.dart';
+export 'controller/controller.dart';
 export 'ui/ui.dart';
