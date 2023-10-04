@@ -66,9 +66,9 @@ class MovieSearchController extends StateNotifier<MovieSearchState> {
 
     final result = (await Future.wait([
       _movieRepository.searchMovies(
-        state.query,
-        pageToFetch,
-        _cancelToken,
+        query: state.query,
+        page: pageToFetch,
+        cancelToken: _cancelToken,
       ),
       // As the API is very fast, we need to wait
       // a little bit to see the loading indicator.

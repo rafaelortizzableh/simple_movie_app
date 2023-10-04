@@ -27,12 +27,14 @@ final movieServiceProvider = Provider.autoDispose<MovieService>(
 );
 
 abstract class MovieService {
-  Future<List<MovieRemoteEntity>> getPopularMovies(int page);
-  Future<List<MovieRemoteEntity>> searchMovies(
-    String query,
-    int page,
-    CancelToken cancelToken,
-  );
+  Future<List<MovieRemoteEntity>> getPopularMovies({
+    required int page,
+  });
+  Future<List<MovieRemoteEntity>> searchMovies({
+    required String query,
+    required int page,
+    required CancelToken cancelToken,
+  });
 }
 
 class TMDBMovieService implements MovieService {
@@ -48,7 +50,7 @@ class TMDBMovieService implements MovieService {
   final LoggerService _loggerService;
 
   @override
-  Future<List<MovieRemoteEntity>> getPopularMovies(int page) async {
+  Future<List<MovieRemoteEntity>> getPopularMovies({required int page}) async {
     try {
       final response = await _dio.get(
         '/movie/popular',
@@ -79,11 +81,11 @@ class TMDBMovieService implements MovieService {
   }
 
   @override
-  Future<List<MovieRemoteEntity>> searchMovies(
-    String query,
-    int page,
-    CancelToken cancelToken,
-  ) async {
+  Future<List<MovieRemoteEntity>> searchMovies({
+    required String query,
+    required int page,
+    required CancelToken cancelToken,
+  }) async {
     try {
       final response = await _dio.get(
         '/search/movie',

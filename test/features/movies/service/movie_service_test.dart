@@ -82,7 +82,7 @@ void main() {
         queryParameters: {'page': 1},
       );
 
-      final movies = await service.getPopularMovies(1);
+      final movies = await service.getPopularMovies(page: 1);
 
       expect(movies, isA<List<MovieRemoteEntity>>());
       expect(movies.length, equals(2));
@@ -116,7 +116,7 @@ void main() {
       );
 
       expect(
-        () async => await service.getPopularMovies(1),
+        () async => await service.getPopularMovies(page: 1),
         throwsA(isA<NoInternetConnectionFailure>()),
       );
     });
@@ -172,9 +172,9 @@ void main() {
 
         // When
         final movies = await service.searchMovies(
-          query,
-          1,
-          cancelToken,
+          query: query,
+          page: 1,
+          cancelToken: cancelToken,
         );
 
         // Then

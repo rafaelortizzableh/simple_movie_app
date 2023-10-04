@@ -52,7 +52,7 @@ void main() {
       (tester) async {
         when(
           () => movieService.getPopularMovies(
-            1,
+            page: 1,
           ),
         ).thenAnswer((value) async => fakeRemoteEntities);
         await tester.pumpApp(
@@ -79,12 +79,12 @@ void main() {
         final pageTwoRemoteEntities = _generateMovies(20, 20);
         when(
           () => movieService.getPopularMovies(
-            1,
+            page: 1,
           ),
         ).thenAnswer((value) async => pageOneRemoteEntities);
         when(
           () => movieService.getPopularMovies(
-            2,
+            page: 2,
           ),
         ).thenAnswer((value) async => pageTwoRemoteEntities);
 
@@ -130,7 +130,7 @@ void main() {
       (tester) async {
         when(
           () => movieService.getPopularMovies(
-            1,
+            page: 1,
           ),
         ).thenThrow(
           const NoInternetConnectionFailure(),

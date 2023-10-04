@@ -35,7 +35,7 @@ void main() {
       () async {
         when(
           () => movieService.getPopularMovies(
-            1,
+            page: 1,
           ),
         ).thenAnswer((value) async => fakeRemoteEntities);
 
@@ -59,7 +59,7 @@ void main() {
       () async {
         when(
           () => movieService.getPopularMovies(
-            1,
+            page: 1,
           ),
         ).thenThrow(const NoInternetConnectionFailure());
 
@@ -81,7 +81,7 @@ void main() {
       () async {
         when(
           () => movieService.getPopularMovies(
-            1,
+            page: 1,
           ),
         ).thenThrow(const SerializationFailure(
           className: 'MovieRemoteEntity',
@@ -131,14 +131,17 @@ void main() {
           ),
         ];
 
-        when(() => movieService.searchMovies(query, 1, cancelToken))
-            .thenAnswer((_) async => expectedRemoteEntities);
+        when(() => movieService.searchMovies(
+              query: query,
+              page: 1,
+              cancelToken: cancelToken,
+            )).thenAnswer((_) async => expectedRemoteEntities);
 
         // When
         final result = await movieRepository.searchMovies(
-          query,
-          1,
-          cancelToken,
+          query: query,
+          page: 1,
+          cancelToken: cancelToken,
         );
 
         final expectedMovies = expectedRemoteEntities
@@ -167,15 +170,19 @@ void main() {
 
         addTearDown(() => cancelToken.cancel());
 
-        when(() => movieService.searchMovies(query, 1, cancelToken)).thenThrow(
+        when(() => movieService.searchMovies(
+              query: query,
+              page: 1,
+              cancelToken: cancelToken,
+            )).thenThrow(
           const NoInternetConnectionFailure(),
         );
 
         // When
         final result = await movieRepository.searchMovies(
-          query,
-          1,
-          cancelToken,
+          query: query,
+          page: 1,
+          cancelToken: cancelToken,
         );
 
         // Then
@@ -198,15 +205,19 @@ void main() {
 
         addTearDown(() => cancelToken.cancel());
 
-        when(() => movieService.searchMovies(query, 1, cancelToken)).thenThrow(
+        when(() => movieService.searchMovies(
+              query: query,
+              page: 1,
+              cancelToken: cancelToken,
+            )).thenThrow(
           const NoMoviesFoundFailure(),
         );
 
         // When
         final result = await movieRepository.searchMovies(
-          query,
-          1,
-          cancelToken,
+          query: query,
+          page: 1,
+          cancelToken: cancelToken,
         );
 
         // Then

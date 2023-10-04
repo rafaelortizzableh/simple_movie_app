@@ -11,3 +11,5 @@ class MockMovieListController extends StateNotifier<MovieListState>
 }
 
 class MockMovieService extends Mock implements MovieService {}
+
+class MockMovieRepository extends Mock implements MovieRepository {}

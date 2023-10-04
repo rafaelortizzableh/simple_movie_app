@@ -22,7 +22,9 @@ class MovieRepository {
     int page,
   ) async {
     try {
-      final movieRemoteEntities = await _movieService.getPopularMovies(page);
+      final movieRemoteEntities = await _movieService.getPopularMovies(
+        page: page,
+      );
       final movies = movieRemoteEntities
           .map(
             (movieRemoteEntity) => movieRemoteEntity.toMovie(),
@@ -35,16 +37,16 @@ class MovieRepository {
     }
   }
 
-  Future<Result<List<Movie>, MovieFailure>> searchMovies(
-    String query,
-    int page,
-    CancelToken cancelToken,
-  ) async {
+  Future<Result<List<Movie>, MovieFailure>> searchMovies({
+    required String query,
+    required int page,
+    required CancelToken cancelToken,
+  }) async {
     try {
       final movieRemoteEntities = await _movieService.searchMovies(
-        query,
-        page,
-        cancelToken,
+        query: query,
+        page: page,
+        cancelToken: cancelToken,
       );
       final movies = movieRemoteEntities
           .map(
